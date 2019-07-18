@@ -25,13 +25,31 @@ void process_image_callback(const sensor_msgs::Image img)
 {
 
     int white_pixel = 255;
+    // Declaring variables
+    int i, row;
 
     // TODO: Loop through each pixel in the image and check if there's a bright white one
     // Then, identify if this pixel falls in the left, mid, or right side of the image
     // Depending on the white ball position, call the drive_bot function and pass velocities to it
     // Request a stop when there's no white ball seen by the camera
 
-    
+    // Dividing image into three sections, equal size, dividing it are the left and right dividers
+
+    int left_divider = img.step / 3;
+    int right_divider = img.step / 3;
+    bool ball_detection = true;
+    // define movement speed and turning speed in radians
+    float forward_move = 0.5;
+    float turn_speed = 0.5;
+    // 
+    for (int i=0; i < img.height * img.step; i)
+    {
+        // ToDo Determine if ball is left, right or center frame
+        
+    }
+
+
+
 }
 
 int main(int argc, char** argv)
