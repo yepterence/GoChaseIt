@@ -36,25 +36,27 @@ void process_image_callback(const sensor_msgs::Image img)
     // Dividing image into three sections, equal size, dividing it are the left and right dividers
 
     int left_divider = img.step / 3;
-    int right_divider = img.step / 3;
+    int right_divider = left_divider * 2;
     bool ball_detection = false;
     // define movement speed and turning speed in radians
-    float forward_move = 0.5;
-    float turn_speed = 0.5;
+    float forward_move = 1.0;
+    float turn_speed = 0.25;
     float stop = 0.0;
 
 
-    float turn_left = 1.0;
-    float turn_right = -1.0;
+    float turn_left = 2.0;
+    float turn_right = -2.0;
 
     // 
-    if (ball_detection = true)
+
+    ROS_INFO("Target acquired");
+    for (int i=0; i < img.height * img.step; ++i)
     {   
-        ROS_INFO("Target acquired");
-        for (int i=0; i < img.height * img.step; i)
+        if (white_pixel == img.data[i])
         {
+            ball_detection == true;
             // ToDo Determine if ball is left, right or center frame
-            if (white_pixel == img.data[i] && i%img.step < left_divider)
+            if (i%img.step < left_divider)
             {
                 ROS_INFO("Target is left, driving left");
                 drive_robot(turn_speed,turn_left);
@@ -73,7 +75,7 @@ void process_image_callback(const sensor_msgs::Image img)
             }
         }
     }
-    else
+    if (ball_detection == false)
     {
         ROS_INFO("Target lost, standing by");
         drive_robot(stop,stop);
