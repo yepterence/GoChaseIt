@@ -20,18 +20,13 @@ void drive_robot(float lin_x, float ang_z)
     }
 }
 
-// This callback function continuously executes and reads the image data
+// Callback function to continuously read image data and execute drive_robot command 
 void process_image_callback(const sensor_msgs::Image img)
 {
 
     int white_pixel = 255;
     // Declaring variables
     int i, row;
-
-    // TODO: Loop through each pixel in the image and check if there's a bright white one
-    // Then, identify if this pixel falls in the left, mid, or right side of the image
-    // Depending on the white ball position, call the drive_bot function and pass velocities to it
-    // Request a stop when there's no white ball seen by the camera
 
     // Dividing image into three sections, equal size, dividing it are the left and right dividers
 
@@ -47,27 +42,32 @@ void process_image_callback(const sensor_msgs::Image img)
     float turn_left = 2.0;
     float turn_right = -2.0;
 
-    // 
+    // Loop through each pixel in the image and check if there's a bright white one
 
     ROS_INFO("Target acquired");
     for (int i=0; i < img.height * img.step; ++i)
     {   
+        
         if (white_pixel == img.data[i])
         {
             ball_detection == true;
-            // ToDo Determine if ball is left, right or center frame
+            
+            // Identify if this pixel falls in three cases: left, middle, or right side of the image  
+            // and calling the drive_bot function to pass velocities to it
+            
             if (i%img.step < left_divider)
             {
                 ROS_INFO("Target is left, driving left");
                 drive_robot(turn_speed,turn_left);
     
-    
             }
+            
             else if (i%img.step > right_divider)
             {
                 ROS_INFO("Target is right, driving right");
                 drive_robot(turn_speed,turn_right);
             }
+            
             else 
             {
                 ROS_INFO("Target straight ahead, proceed forward");
@@ -75,6 +75,7 @@ void process_image_callback(const sensor_msgs::Image img)
             }
         }
     }
+    // Request a stop when there's no white ball seen by the camera
     if (ball_detection == false)
     {
         ROS_INFO("Target lost, standing by");
