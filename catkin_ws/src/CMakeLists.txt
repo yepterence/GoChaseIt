@@ -1,1 +1,1 @@
-/opt/clearpath/2.14/share/catkin/cmake/toplevel.cmake
+/opt/ros/kinetic/share/catkin/cmake/toplevel.cmake
