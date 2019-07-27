@@ -32,7 +32,7 @@
               -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
 
   <!--launch rviz-->
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find package_name)/rviz/chaseviz.rviz" />
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find my_robot)/rviz/chaseviz.rviz" />
               
 </launch>
 
