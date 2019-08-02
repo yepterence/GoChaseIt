@@ -1,6 +1,9 @@
 #include "ros/ros.h"
 #include "ball_chaser/DriveToTarget.h"
 #include <sensor_msgs/Image.h>
+#include <iostream>
+
+ 
 
 // Define a global client that can request services
 ros::ServiceClient client;
@@ -24,65 +27,85 @@ void drive_robot(float lin_x, float ang_z)
 void process_image_callback(const sensor_msgs::Image img)
 {
 
-    int white_pixel = 255;
     // Declaring variables
-    int i, row;
-
-    // Dividing image into three sections, equal size, dividing it are the left and right dividers
-
+    int red_pixel, green_pixel, blue_pixel, i, row;
     int left_divider = img.step / 3;
     int right_divider = left_divider * 2;
+    //Set initial ball existance
     bool ball_detection = false;
+    
     // define movement speed and turning speed in radians
     float forward_move = 1.0;
     float turn_speed = 0.25;
     float stop = 0.0;
 
-
-    float turn_left = 2.0;
-    float turn_right = -2.0;
+    //Turning speeds
+    float turn_left = -2.0;
+    float turn_right = 2.0;
 
     // Loop through each pixel in the image and check if there's a bright white one
-
-    ROS_INFO("Target acquired");
-    for (int i=0; i < img.height * img.step; ++i)
+    // 
+    
+    for (int i=0;i < img.height * img.step; ++i)
     {   
         
-        if (white_pixel == img.data[i])
+        int red_pixel = img.data[i];
+        int green_pixel = img.data[i+1];
+        int blue_pixel = img.data[i+2];
+
+        if (i%img.step < left_divider && red_pixel == 255 && green_pixel == 255 && blue_pixel == 255)
         {
-            ball_detection == true;
+        
+            ROS_INFO("Target acquired");
             
-            // Identify if this pixel falls in three cases: left, middle, or right side of the image  
-            // and calling the drive_bot function to pass velocities to it
+            ROS_INFO("Target is left, driving left");
+            drive_robot(stop,turn_left);
+            // drive_robot(turn_left,turn_speed);
+        }
             
-            if (i%img.step < left_divider)
-            {
-                ROS_INFO("Target is left, driving left");
-                drive_robot(turn_speed,turn_left);
-    
-            }
-            
-            else if (i%img.step > right_divider)
-            {
-                ROS_INFO("Target is right, driving right");
-                drive_robot(turn_speed,turn_right);
-            }
-            
-            else 
-            {
-                ROS_INFO("Target straight ahead, proceed forward");
-                drive_robot(forward_move,stop);
-            }
+        else if (i%img.step > right_divider && red_pixel == 255 && green_pixel == 255 && blue_pixel == 255)
+        {
+            ROS_INFO("Target is right, driving right");
+            drive_robot(stop,turn_right);
+            // drive_robot(turn_right,turn_speed);
+        }
+        
+        else if (red_pixel == 255 && green_pixel == 255 && blue_pixel == 255)
+        {
+            ROS_INFO("Target straight ahead, proceed forward");
+            drive_robot(forward_move,stop);
+        }
+
+    // Request a stop when there's no white ball seen by the camera
+        else
+        {
+            ROS_INFO("Target lost, standing by");
+            drive_robot(stop,stop);
         }
     }
-    // Request a stop when there's no white ball seen by the camera
-    if (ball_detection == false)
-    {
-        ROS_INFO("Target lost, standing by");
-        drive_robot(stop,stop);
-    }
-
 }
+        // else
+        // {
+        // 	int mean_scan_position = scan_position_sum / white_pixel_count;
+        // 	// Check if pixels are on left frame
+        // 	if (mean_scan_position < img.width /3)
+        // 	{
+        // 		ROS_INFO("turning left, moving forward");
+        // 		drive_robot(forward_move, turn_left);
+
+        // 	}
+        // 	// Check if pixels are on right frame
+        // 	else if (mean_scan_position > img.width * 2/3)
+        // 	{
+        // 		ROS_INFO("turning right, moving forward");
+        // 		drive_robot(forward_move, turn_right);
+        // 	}
+        // 	else
+        // 	{
+        // 		ROS_INFO("Target ahead, driving forward");
+        // 		drive_robot(forward_move, 0.0);
+        // 	}
+
 
 
 int main(int argc, char** argv)
